@@ -163,7 +163,6 @@ if [[ -z "$XTERM_VERSION" ]]; then
 		printstep_newline=1
 		printf "It is recommended to have xterm installed.\n"
 		if fn_askuser "Install xterm?" 'N' '5'; then
-			printf '\n'
 			fn_printstep 'Installing xterm...'
 			sudo apt-get -y install xterm
 			apt_exitcode="$?"
@@ -233,7 +232,6 @@ if [[ -z `whereis curl | cut -d ':' -f2` ]]; then
 	printstep_newline=1
 	printf "Error: curl is not installed.\n"
 	if fn_askuser "Install curl?" 'Y'; then
-		printf '\n'
 		fn_printstep 'Installing curl...'
 		sudo apt-get -y install curl
 		apt_exitcode="$?"
