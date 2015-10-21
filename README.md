@@ -8,4 +8,5 @@ You can do it from the terminal like this:
 
 On the first start, it will ask you to install it. If you do, you can later remove the .sh file you downloaded. 
 During the installation it will let you have a link in your applications menu with the name *4K Updater/Launcher* under the *Internet* (or *Networking*) section.
+
 To uninstall this script, open a terminal and type `/opt/4klauncher/4K_UpdateLaunch.sh uninstall`. This script does not take any other arguments.
