@@ -93,9 +93,9 @@ case "$1" in
 		# Check if already installed
 		if ! [[ -f "$installpath" ]]; then
 			fn_error "This script is not installed."
-			printstep_newline=1
 		fi
 		if fn_askuser "Do you want to uninstall this script?" 'N'; then
+			printstep_newline=1
 			fn_printstep "Uninstalling "$(basename "$0")""
 			sudo rm -rv "`dirname "$installpath"`" || fn_error
 			printf "Removing '"$desktoppath"'\n"
