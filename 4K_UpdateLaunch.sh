@@ -17,10 +17,10 @@ function fn_error {
 }
 
 function fn_ubuntucheck {
-	if [[
-		-z `whereis 'x-terminal-emulator' | cut -d ':' -f2` ||
-		! (-f '/usr/bin/apt-get')
-	]]; then
+	if
+		! which 'x-terminal-emulator' >/dev/null ||
+		[[ ! -f '/usr/bin/apt-get' ]]
+	then
 		fn_error "4K Video Downloader is only available for Ubuntu-based distributions."
 	fi
 }
@@ -148,7 +148,7 @@ function fn_reruninxterm {
 # If not in xterm
 if [[ -z "$XTERM_VERSION" ]]; then
 	# If xterm is present
-	if [[ -n `whereis xterm | cut -d ':' -f2` ]]; then
+	if which 'xterm' >/dev/null; then
 		fn_reruninxterm
 	# If xterm is not present, use generic terminal
 	else
@@ -214,11 +214,13 @@ if ! [[ -f "$installpath" ]]; then
 			xdg-desktop-menu install --novendor --mode user "$desktoppath"
 		fi
 			printf "\nScript installed in "$installpath"\n"
-			printf "You can now find it in your applications menu as '4K Updater/Launcher'.\n"
+			printf "You can now find it in your applications menu as '4K Updater/Launcher', under\n"
+			printf "the 'Internet' (or 'Networking') section.\n"
 			printf 'To uninstall it, open a terminal and type:\n'
 			printf '\t$ /opt/4klauncher/4K_UpdateLaunch.sh uninstall\n'
+			printf '\nPress a key to close the installer.\n'
 			read -n10 -t.1
-			read -n1 -t 10
+			read -n1
 			#fn_reruninxterm "$installpath"
 			exit 0
 	else
@@ -228,7 +230,7 @@ fi
 
 ### CURL CHECK
 # If curl not present
-if [[ -z `whereis curl | cut -d ':' -f2` ]]; then
+if ! which 'curl' >/dev/null; then
 	printstep_newline=1
 	printf "Error: curl is not installed.\n"
 	if fn_askuser "Install curl?" 'Y'; then
@@ -270,8 +272,14 @@ function fn_launch {
 }
 
 ### MAIN CODE
-cd ~/'Downloads/' ||
- cd "$HOME"
+cd ~/'Downloads/' 2>/dev/null ||
+ eval "$(grep -E '^XDG_DOWNLOAD_DIR=' ""$HOME"/.config/user-dirs.dirs" 2>/dev/null)"
+ if [[ -n "$XDG_DOWNLOAD_DIR" ]]; then
+ 	cd "$XDG_DOWNLOAD_DIR" 2>/dev/null ||
+ 	 cd "$HOME"
+ else
+ 	cd "$HOME"
+ fi
 
 fn_printstep "Fetching latest version..."
 
