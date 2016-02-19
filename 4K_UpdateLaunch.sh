@@ -272,14 +272,15 @@ function fn_launch {
 }
 
 ### MAIN CODE
-cd ~/'Downloads/' 2>/dev/null ||
- eval "$(grep -E '^XDG_DOWNLOAD_DIR=' ""$HOME"/.config/user-dirs.dirs" 2>/dev/null)"
- if [[ -n "$XDG_DOWNLOAD_DIR" ]]; then
- 	cd "$XDG_DOWNLOAD_DIR" 2>/dev/null ||
- 	 cd "$HOME"
- else
- 	cd "$HOME"
- fi
+cd ~/'Downloads/' 2>/dev/null || {
+	eval "$(grep -E '^XDG_DOWNLOAD_DIR=' ""$HOME"/.config/user-dirs.dirs" 2>/dev/null)"
+	if [[ -n "$XDG_DOWNLOAD_DIR" ]]; then
+		cd "$XDG_DOWNLOAD_DIR" 2>/dev/null ||
+		 cd "$HOME"
+	else
+		cd "$HOME"
+	fi
+}
 
 fn_printstep "Fetching latest version..."
 
@@ -298,7 +299,7 @@ downloadpage="$(
 )"
 
 lastdeburl="$(
-	grep -ow 'http://.*downloads\.4kdownload\.com/app/4kvideodownloader.*\.deb' <<<"$downloadpage" |
+	grep -ow 'https://.*downloads\.4kdownload\.com/app/4kvideodownloader.*\.deb' <<<"$downloadpage" |
 	  head -n1
 )"
 
