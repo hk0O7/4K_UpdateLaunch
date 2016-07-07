@@ -332,7 +332,9 @@ fi
 printf "Latest version found: "$lastdebversion"\n"
 printf "Installed version: "$installedversion"\n"
 
-if [[ "$lastdebversion" == "$installedversion" ]]; then
+if [[ "`sed -r 's/\.//g' <<< "$lastdebversion"`" \
+   -le "`sed -r 's/\.//g' <<< "$installedversion"`" \
+]]; then
 	printf 'Up to date.\n'
 	fn_launch
 else
