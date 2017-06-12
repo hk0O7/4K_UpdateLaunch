@@ -139,7 +139,7 @@ function fn_reruninxterm {
 	setsid xterm \
 	   -fn 9x15 \
 	   -bg black -fg white \
-	   -T '4k Download Updater' \
+	   -T '4K Updater' \
 	   -e "$path" \
 	&
 	sleep 0.1
@@ -299,7 +299,7 @@ downloadpage="$(
 )"
 
 lastdeburl="$(
-	grep -ow 'https://.*downloads\.4kdownload\.com/app/4kvideodownloader.*\.deb' <<<"$downloadpage" |
+	grep -owE 'https://.*downloads[[:digit:]]?\.4kdownload\.com/app/4kvideodownloader.*\.deb' <<<"$downloadpage" |
 	  head -n1
 )"
 
