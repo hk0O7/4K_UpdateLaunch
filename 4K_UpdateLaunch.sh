@@ -299,7 +299,7 @@ downloadpage="$(
 )"
 
 lastdeburl="$(
-	grep -owE 'https://.*downloads[[:digit:]]?\.4kdownload\.com/app/4kvideodownloader.*\.deb' <<<"$downloadpage" |
+	grep -owE 'https://dl\.4kdownload\.com/app/4kvideodownloader.*\.deb' <<<"$downloadpage" |
 	  head -n1
 )"
 
