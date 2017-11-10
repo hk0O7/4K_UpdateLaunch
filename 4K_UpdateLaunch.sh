@@ -312,9 +312,10 @@ lastdebfilename=`basename $lastdeburl`
 if [[ "$arch" = 'x86_64' ]]; then arch='x64'
 else arch='x86'
 fi
+
 lastdebversion=$(
-	printf "$downloadpage" |
-	  grep -Eo "'videodownloader_[[:digit:]]\.[[:digit:]]\.[[:digit:]]\.[[:digit:]]*_ubuntu_"$arch"'" |
+	printf '%s' "$downloadpage" |
+	  grep -Eo "'videodownloader_([[:digit:]]\.){3}[[:digit:]]*_ubuntu_"$arch"'" |
 	  head -n1 |
 	  cut -d '_' -f2
 )
