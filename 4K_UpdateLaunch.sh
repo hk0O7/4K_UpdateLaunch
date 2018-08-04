@@ -315,7 +315,7 @@ fi
 
 lastdebversion=$(
 	printf '%s' "$downloadpage" |
-	  grep -Eo "'videodownloader_([[:digit:]]\.){3}[[:digit:]]*_ubuntu_"$arch"'" |
+	  grep -Eo "'videodownloader_([[:digit:]]{1,2}\.){3}[[:digit:]]*_ubuntu_"$arch"'" |
 	  head -n1 |
 	  cut -d '_' -f2
 )
@@ -323,7 +323,7 @@ lastdebversion=$(
 # If 4K is installed
 if [[ -f '/usr/lib/4kvideodownloader/4kvideodownloader-bin' ]]; then
 	installedversion=$(
-		grep -Eao '[[:digit:]]\.[[:digit:]]\.[[:digit:]]\.[[:digit:]]{4}' \
+		grep -Eao '([[:digit:]]{1,2}\.){3}[[:digit:]]{4}' \
 		   '/usr/lib/4kvideodownloader/4kvideodownloader-bin'
 	)
 else
