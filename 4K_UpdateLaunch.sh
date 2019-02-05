@@ -333,9 +333,20 @@ fi
 printf "Latest version found: "$lastdebversion"\n"
 printf "Installed version: "$installedversion"\n"
 
-if [[ "`sed -r 's/\.//g' <<< "$lastdebversion"`" \
-   -le "`sed -r 's/\.//g' <<< "$installedversion"`" \
-]]; then
+if [[ "$installedversion" == 'NONE' ]]; then update=1
+else
+	update=0; for ((i=1; i <= 4; i++)); do
+		lastdebversion_n="`cut -d '.' -f "$i" <<< "$lastdebversion"`"
+		installedversion_n="`cut -d '.' -f "$i" <<< "$installedversion"`"
+		
+		if ((lastdebversion_n > installedversion_n)); then
+			update=1
+			break
+		elif ((lastdebversion_n < installedversion_n)); then break; fi
+	done; unset i lastdebversion_n installedversion_n
+fi
+
+if ((update == 0)); then
 	printf 'Up to date.\n'
 	fn_launch
 else
