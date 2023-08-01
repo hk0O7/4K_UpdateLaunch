@@ -2,7 +2,7 @@
 
 
 installpath='/opt/4klauncher/4K_UpdateLaunch.sh'
-desktoppath=""$HOME"/.local/share/applications/4K_UpdateLaunch.desktop"
+desktoppath="$HOME/.local/share/applications/4K_UpdateLaunch.desktop"
 
 function fn_error {
 	local errormsg="$1"
@@ -37,7 +37,7 @@ function fn_askuser {
 	while [[ 1 ]]; do
 		if [[ -n "$timeout" ]]; then printf '\e[u\e[K'; fi
 		printf "$question"
-		if [[ -n "$timeout" ]]; then printf " ("$timer")"; fi
+		if [[ -n "$timeout" ]]; then printf ' (%i)' $timer; fi
 		case "$defaultanswer" in
 			[Yy] ) printf ' [Y/n] ';;
 			[Nn] ) printf ' [y/N] ';;
@@ -96,9 +96,9 @@ case "$1" in
 		fi
 		if fn_askuser "Do you want to uninstall this script?" 'N'; then
 			printstep_newline=1
-			fn_printstep "Uninstalling "$(basename "$0")""
-			sudo rm -rv "`dirname "$installpath"`" || fn_error
-			printf "Removing '"$desktoppath"'\n"
+			fn_printstep "Uninstalling $(basename "$0")"
+			sudo rm -rv "$(dirname "$installpath")" || fn_error
+			printf "Removing '$desktoppath'\n"
 			xdg-desktop-menu uninstall --mode user "$desktoppath" ||
 			 rm -v "$desktoppath"
 			printf "Script uninstalled.\n"
@@ -168,7 +168,7 @@ if [[ -z "$XTERM_VERSION" ]]; then
 			apt_exitcode="$?"
 			printf '\n'
 			if [[ "$apt_exitcode" != '0' ]]; then
-				fn_error "APT exited with status "$apt_exitcode""
+				fn_error "APT exited with status $apt_exitcode"
 			fi
 			fn_reruninxterm
 		fi
@@ -209,11 +209,10 @@ if ! [[ -f "$installpath" ]]; then
 			if [[ "$?" != '0' ]]; then
 				fn_error "Failed to write .desktop file."
 			fi
-			printf "Created '"$desktoppath"'\n"
-#			desktop-file-install --dir="$(dirname "$desktoppath")" "$desktoppath"
+			printf "Created '$desktoppath'\n"
 			xdg-desktop-menu install --novendor --mode user "$desktoppath"
 		fi
-			printf "\nScript installed in "$installpath"\n"
+			printf "\nScript installed in $installpath\n"
 			printf "You can now find it in your applications menu as '4K Updater/Launcher', under\n"
 			printf "the 'Internet' (or 'Networking') section.\n"
 			printf 'To uninstall it, open a terminal and type:\n'
@@ -238,7 +237,7 @@ if ! which 'curl' >/dev/null; then
 		sudo apt-get -y install curl
 		apt_exitcode="$?"
 		if [[ "$apt_exitcode" != '0' ]]; then
-			fn_error "APT exited with status "$apt_exitcode""
+			fn_error "APT exited with status $apt_exitcode"
 		fi
 		printf "curl installed.\n"
 	else
@@ -273,7 +272,7 @@ function fn_launch {
 
 ### MAIN CODE
 cd ~/'Downloads/' 2>/dev/null || {
-	eval "$(grep -E '^XDG_DOWNLOAD_DIR=' ""$HOME"/.config/user-dirs.dirs" 2>/dev/null)"
+	eval "$(grep -E '^XDG_DOWNLOAD_DIR=' "$HOME/.config/user-dirs.dirs" 2>/dev/null)"
 	if [[ -n "$XDG_DOWNLOAD_DIR" ]]; then
 		cd "$XDG_DOWNLOAD_DIR" 2>/dev/null ||
 		 cd "$HOME"
@@ -285,21 +284,21 @@ cd ~/'Downloads/' 2>/dev/null || {
 fn_printstep "Fetching latest version..."
 
 # 32/64-bit detection
-case `uname -m` in
+case $(uname -m) in
 	i[0-9]86 ) arch='x86' ;;
 	'x86_64' ) arch='x86_64' ;;
 	* ) fn_error "Architecture not detected.";;
 esac
-curl_useragent="Ubuntu Linux "$arch""
+curl_useragent="Ubuntu Linux $arch"
 
 downloadpage="$(
-	curl -s \
+	curl -sL \
 	   --user-agent "$curl_useragent" \
-	   'https://www.4kdownload.com/?source=videodownloader'
+	   'https://www.4kdownload.com/downloads'
 )"
 
 lastdeburl="$(
-	grep -owE 'https://dl\.4kdownload\.com/app/4kvideodownloader.*\.deb' <<<"$downloadpage" |
+	grep -owE -m1 'https://dl\.4kdownload\.com/app/4kvideodownloader_.*\.deb' <<<"$downloadpage" |
 	  head -n1
 )"
 
@@ -307,17 +306,16 @@ if [[ -z "$lastdeburl" ]]; then
 	fn_error "Failed to retrieve information. Check your connection."
 fi
 
-lastdebfilename=`basename $lastdeburl`
+lastdebfilename=$(basename $lastdeburl)
 
 if [[ "$arch" = 'x86_64' ]]; then arch='x64'
 else arch='x86'
 fi
 
 lastdebversion=$(
-	printf '%s' "$downloadpage" |
-	  grep -Eo "'videodownloader_([[:digit:]]{1,2}\.){3}[[:digit:]]*_ubuntu_"$arch"'" |
-	  head -n1 |
-	  cut -d '_' -f2
+	grep -Eo -m1 "'videodownloader_([[:digit:]]{1,2}\.){3}[[:digit:]]*_ubuntu_$arch'" \
+	  <<< "$downloadpage" |
+	 cut -d '_' -f2
 )
 
 # If 4K is installed
@@ -330,14 +328,14 @@ else
 	installedversion='NONE'
 fi
 
-printf "Latest version found: "$lastdebversion"\n"
-printf "Installed version: "$installedversion"\n"
+printf 'Latest version found: %s\n' "$lastdebversion"
+printf 'Installed version: %s\n' "$installedversion"
 
 if [[ "$installedversion" == 'NONE' ]]; then update=1
 else
 	update=0; for ((i=1; i <= 4; i++)); do
-		lastdebversion_n="`cut -d '.' -f "$i" <<< "$lastdebversion"`"
-		installedversion_n="`cut -d '.' -f "$i" <<< "$installedversion"`"
+		lastdebversion_n=$(cut -d '.' -f "$i" <<< "$lastdebversion")
+		installedversion_n=$(cut -d '.' -f "$i" <<< "$installedversion")
 		
 		if ((lastdebversion_n > installedversion_n)); then
 			update=1
@@ -357,7 +355,7 @@ fn_printstep "Downloading the latest version..."
 curl --progress-bar "$lastdeburl" -o "$lastdebfilename"
 curl_exitcode="$?"
 if [[ "$curl_exitcode" != '0' ]]; then
-	fn_error "curl exited with status "$curl_exitcode""
+	fn_error "curl exited with status $curl_exitcode"
 fi
 
 function fn_installdeb {
