@@ -297,8 +297,10 @@ downloadpage="$(
 	   'https://www.4kdownload.com/downloads'
 )"
 
+lastdeburl_pattern='https://dl\.4kdownload\.com/app/4kvideodownloader_.*\.deb'
+
 lastdeburl="$(
-	grep -owE -m1 'https://dl\.4kdownload\.com/app/4kvideodownloader_.*\.deb' <<<"$downloadpage" |
+	grep -owE -m1 $lastdeburl_pattern <<<"$downloadpage" |
 	  head -n1
 )"
 
@@ -313,10 +315,10 @@ else arch='x86'
 fi
 
 lastdebversion=$(
-	grep -Eo -m1 "'videodownloader_([[:digit:]]{1,2}\.){3}[[:digit:]]*_ubuntu_$arch'" \
-	  <<< "$downloadpage" |
-	 cut -d '_' -f2
-)
+	grep -B3 -E "$lastdeburl_pattern" <<< $downloadpage |
+	 grep -m1 -iw version |
+	 grep -Eo '[0-9]{1,2}([\._-][0-9]+)+'
+) || lastdebversion=$(cut -d_ -f2 <<< $lastdebfilename)
 
 # If 4K is installed
 if [[ -f '/usr/lib/4kvideodownloader/4kvideodownloader-bin' ]]; then
